@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Cho Tot's Assignment</title>
+    <style>
+        img {
+            margin: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="gallery">
+    </div>
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    var socket = io('http://localhost:8080');
+    socket.on('imageDownloaded', function(data) {
+        console.log(data);
+        var createImage = function(url) {
+            var img = $('<img>'); //Equivalent: $(document.createElement('img'))
+            img.attr('src', url);
+            img.appendTo('#gallery');
+        }
+        for (var key in data)
+        {
+            var img = data[key];
+            createImage(key);
+        }
+    });
+</script>
+
+</html>
