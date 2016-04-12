@@ -47,7 +47,7 @@ var fetchIO = io.on('connection', function (socket) {
                         newImgs[attr] = {
                             left: 0,
                             top: 0,
-                            id: i
+                            id: i++
                         };
                         changed = true;
                     }
@@ -56,15 +56,14 @@ var fetchIO = io.on('connection', function (socket) {
                         newImgs[attr] = {
                             left: 0,
                             top: 0,
-                            id: i
+                            id: i++
                         };
-                        i++;
                         changed = true;
                     }
                 }
             }
             if (changed === true) {
-                console.log('changed', newImgs);
+                console.log('New Images', newImgs);
                 imgs = object_assign({}, imgs, newImgs);
                 fetchIO.emit('imageDownloaded', newImgs);
             }
@@ -78,7 +77,8 @@ var fetchIO = io.on('connection', function (socket) {
             left: data.left,
             top: data.top,
         });
-        imgs = object_assign({}, imgs, newImg);
+        imgs[data.url] = newImg;
+        console.log('Changed', data.url, newImg);
         fetchIO.emit('imageChanged', newImg);
     });
 

@@ -30,6 +30,7 @@
 <script>
     var socket = io('http://localhost:8080');
     socket.on('imageChanged', function(data) {
+        console.log('changed', data);
         $('#image' + data.id).css({
             left: data.left,
             top: data.top,
@@ -39,25 +40,28 @@
     socket.on('imageDownloaded', function(data) {
         console.log(data);
         var createImage = function(url, imgData) {
-            var img = $('<img>'); //Equivalent: $(document.createElement('img'))
-            img.attr('id', 'image' + imgData.id);
-            img.attr('src', url);
-            img.css('position', 'relative');
-            img.css('left', imgData.left);
-            img.css('top', imgData.top);
+            var img = $('<div>'); //Equivalent: $(document.createElement('img'))
+            var imageId = 'image' + imgData.id;
+            img.attr('id', imageId);
             img.addClass('draggable');
             img.appendTo('#gallery');
             $(img).draggable({
                 grid: [20, 20],
                 stop: function(e) {
                     socket.emit('changePosition', {
-                        url: this.src,
+                        url: $(this).data("backgroundUrl"),
                         left: e.target.style.left,
                         top: e.target.style.top
                     });
                     console.log(e.target.style.left, e.target.style.top);
                 }
             });
+            $(img).css("position", "relative");
+            $(img).data("backgroundUrl", url);
+            $(img).css("background-image", "url(" + url + ")");
+            $(img).css("left", imgData.left);
+            $(img).css("top", imgData.top);
+            img.attr('src', url);
         }
         for (var key in data) {
             var img = data[key];
