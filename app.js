@@ -30,6 +30,7 @@ var i = 0;
 var fetchIO = io.on('connection', function (socket) {
     socket.emit('imageDownloaded', imgs);
     var fetchDone = true;
+
     var fetchIntervalId = setInterval(function () {
         if (!fetchDone) return;
         fetchDone = false;
@@ -44,15 +45,20 @@ var fetchIO = io.on('connection', function (socket) {
                     var attr = row.attribs.src; //['data-original'];
                     if (attr && !imgs[attr]) {
                         newImgs[attr] = {
-                            position: i++
+                            left: 0,
+                            top: 0,
+                            id: i
                         };
                         changed = true;
                     }
                     attr = row.attribs['data-original'];
                     if (attr && !imgs[attr]) {
                         newImgs[attr] = {
-                            position: i++
+                            left: 0,
+                            top: 0,
+                            id: i
                         };
+                        i++;
                         changed = true;
                     }
                 }
@@ -65,6 +71,16 @@ var fetchIO = io.on('connection', function (socket) {
             fetchDone = true;
         });
     }, FETCH_INTERVAL);
+
+    socket.on('changePosition', function(data){
+        var currentImg = imgs[data.url];
+        var newImg = object_assign({}, currentImg, {
+            left: data.left,
+            top: data.top,
+        });
+        imgs = object_assign({}, imgs, newImg);
+        fetchIO.emit('imageChanged', newImg);
+    });
 
     socket.on('disconnect', function () {
         clearInterval(fetchIntervalId);

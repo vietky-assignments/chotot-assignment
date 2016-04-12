@@ -29,23 +29,39 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
     var socket = io('http://localhost:8080');
+    socket.on('imageChanged', function(data) {
+        $('#image' + data.id).css({
+            left: data.left,
+            top: data.top,
+        });
+    });
+
     socket.on('imageDownloaded', function(data) {
         console.log(data);
-        var createImage = function(url) {
+        var createImage = function(url, imgData) {
             var img = $('<img>'); //Equivalent: $(document.createElement('img'))
+            img.attr('id', 'image' + imgData.id);
             img.attr('src', url);
+            img.css('position', 'relative');
+            img.css('left', imgData.left);
+            img.css('top', imgData.top);
             img.addClass('draggable');
             img.appendTo('#gallery');
             $(img).draggable({
                 grid: [20, 20],
                 stop: function(e) {
-                    console.log(e.clientX, e.clientY);
+                    socket.emit('changePosition', {
+                        url: this.src,
+                        left: e.target.style.left,
+                        top: e.target.style.top
+                    });
+                    console.log(e.target.style.left, e.target.style.top);
                 }
             });
         }
         for (var key in data) {
             var img = data[key];
-            createImage(key);
+            createImage(key, img);
         }
     });
 </script>
