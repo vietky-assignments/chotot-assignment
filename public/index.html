@@ -3,9 +3,19 @@
 
 <head>
     <title>Cho Tot's Assignment</title>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
     <style>
         img {
             margin: 10px;
+        }
+
+        .draggable {
+            width: 90px;
+            height: 80px;
+            padding: 5px;
+            float: left;
+            margin: 0 10px 10px 0;
+            font-size: .9em;
         }
     </style>
 </head>
@@ -15,6 +25,7 @@
     </div>
 </body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script>
     var socket = io('http://localhost:8080');
@@ -23,10 +34,16 @@
         var createImage = function(url) {
             var img = $('<img>'); //Equivalent: $(document.createElement('img'))
             img.attr('src', url);
+            img.addClass('draggable');
             img.appendTo('#gallery');
+            $(img).draggable({
+                grid: [20, 20],
+                stop: function(e) {
+                    console.log(e.clientX, e.clientY);
+                }
+            });
         }
-        for (var key in data)
-        {
+        for (var key in data) {
             var img = data[key];
             createImage(key);
         }
